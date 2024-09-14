@@ -115,3 +115,17 @@ export const moveMapIn2048Rule = (
   type RotateDegree = 0 | 90 | 180 | 270;
   type DirectionDegreeMap = Record<Direction, RotateDegree>;
   type MoveResult = { result: Map2048; isMoved: boolean };
+
+export const getRandomInitPos = (rowLength: number, columnLength: number): number[][] => {
+  const firstPosition: number = Math.floor(Math.random() * rowLength * columnLength);
+  let secondPosition: number;
+  do {
+    secondPosition = Math.floor(Math.random() * rowLength * columnLength);
+  } while (firstPosition === secondPosition);
+
+  const firstRow: number = Math.floor(firstPosition / rowLength);
+  const firstColumn: number = firstPosition % rowLength;
+  const secondRow: number = Math.floor(secondPosition / rowLength);
+  const secondColumn: number = secondPosition % rowLength;
+  return [[firstRow, firstColumn], [secondRow, secondColumn]];
+};
