@@ -39,7 +39,7 @@ export const moveMapIn2048Rule = (
         return Array.from({ length: columnLength }, (_, columnIndex) =>
           Array.from(
             { length: rowLength },
-            (_, rowIndex) => map[rowIndex][columnLength - columnIndex - 1],
+            (_, rowIndex) => map[rowIndex]?.[columnLength - columnIndex - 1] ?? null,
           ),
         );
       case 180:
@@ -47,14 +47,14 @@ export const moveMapIn2048Rule = (
           Array.from(
             { length: columnLength },
             (_, columnIndex) =>
-              map[rowLength - rowIndex - 1][columnLength - columnIndex - 1],
+              map[rowLength - rowIndex - 1]?.[columnLength - columnIndex - 1] ?? null,
           ),
         );
       case 270:
         return Array.from({ length: columnLength }, (_, columnIndex) =>
           Array.from(
             { length: rowLength },
-            (_, rowIndex) => map[rowLength - rowIndex - 1][columnIndex],
+            (_, rowIndex) => map[rowLength - rowIndex - 1]?.[columnIndex] ?? null,
           ),
         );
     }
