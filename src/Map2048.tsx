@@ -116,6 +116,12 @@ export const moveMapIn2048Rule = (
   type DirectionDegreeMap = Record<Direction, RotateDegree>;
   type MoveResult = { result: Map2048; isMoved: boolean };
 
+/**
+ * 2048 게임에서, Map의 2개의 초기 블록 위치를 반환하는 함수입니다.
+ * @param rowLength Map의 행 길이
+ * @param columnLength Map의 열 길이
+ * @returns 2048 게임의 2개의 초기 블록 위치
+ */
 export const getRandomInitPos = (rowLength: number, columnLength: number): number[][] => {
   const firstPosition: number = Math.floor(Math.random() * rowLength * columnLength);
   let secondPosition: number;
@@ -129,3 +135,48 @@ export const getRandomInitPos = (rowLength: number, columnLength: number): numbe
   const secondColumn: number = secondPosition % rowLength;
   return [[firstRow, firstColumn], [secondRow, secondColumn]];
 };
+
+/**
+ * 2048 게임에서, Map에 랜덤한 위치에 블록을 놓을 수 있는지 확인하고, 가능하다면 랜덤한 위치를 반환하는 함수입니다.
+ * @param map Map2048
+ * @returns 신규 블록을 놓을 수 있는 랜덤한 위치 (행, 열) 또는 null
+ */
+export const getRandomPos = (map: Map2048): [number, number] | null => {
+  const emptyPositions: [number, number][] = [];
+  map.forEach((row, rowIndex) => {
+    row.forEach((cell, columnIndex) => {
+      if (cell === null) {
+        emptyPositions.push([rowIndex, columnIndex]);
+      }
+    });
+  });
+  if (emptyPositions.length === 0) {
+    return null;
+  }
+
+  const randomIndex: number = Math.floor(Math.random() * emptyPositions.length);
+  return emptyPositions[randomIndex] ?? null;
+}
+
+export const stringDirectionMap: Record<string, Direction> = {
+  ArrowUp: 'up',
+  ArrowRight: 'right',
+  ArrowDown: 'down',
+  ArrowLeft: 'left',
+};
+
+export const isGameWin = (map: Map2048): boolean => {
+  const WINNING_SCORE = 2048;
+  return map.some(row => row.some(cell => cell === WINNING_SCORE));
+}
+
+export const isGameLose = (map: Map2048): boolean => {
+  const isFull = map.every(row => row.every(cell => cell !== null));
+  if (!isFull) return false;
+
+  const isMovable = Object.values(stringDirectionMap).some(direction => {
+    const { isMoved } = moveMapIn2048Rule(map, direction);
+    return isMoved;
+  });
+  return !isMovable;
+}

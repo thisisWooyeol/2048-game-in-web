@@ -1,14 +1,17 @@
 import './App.css';
 
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 
-import { getRandomInitPos, type Map2048 } from './Map2048';
+import { getRandomInitPos, getRandomPos, isGameLose, isGameWin,type Map2048, moveMapIn2048Rule, stringDirectionMap } from './Map2048';
 
 
 function App() {
   const rowLength: number = 4;
   const columnLength: number = 4;
   const initPos: number[][] = getRandomInitPos(rowLength, columnLength);
+
+  const [keyPressed, setKeyPressed] = useState<string>('');
+  const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>('playing');
 
   const [map, setMap] = useState<Map2048>(
     Array.from({ length: rowLength }, (_, rowIndex) =>
@@ -23,6 +26,49 @@ function App() {
         ),
       )
     );
+
+  useEffect(() => {
+    const handleKeyUp = (event: WindowEventMap['keyup']) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        setKeyPressed(event.key);
+        console.info(`Arrow key pressed: ${event.key}`);
+      }
+    };
+
+    window.addEventListener('keyup', handleKeyUp);
+
+    return () => {
+      window.removeEventListener('keyup', handleKeyUp);
+    };
+  }, []);
+
+  useEffect(() => {
+    const direction = stringDirectionMap[keyPressed];
+    if (direction !== undefined) {
+      const {result, isMoved} = moveMapIn2048Rule(map, direction);
+      // Update the map state if moved
+      if (isMoved) {
+        const newBlockPos: [number, number] | null = getRandomPos(result);
+        if (newBlockPos !== null) {
+          const [rowIndex, columnIndex] = newBlockPos;
+          result[rowIndex][columnIndex] = 2;
+          console.info(`New block at: ${rowIndex}, ${columnIndex}`);
+        }
+        setMap(result);
+      }
+    }
+    setKeyPressed('');
+    
+    // check if the game is over
+    if (isGameWin(map)) {
+      setGameStatus('win');
+      console.info('You win!');
+    }
+    else if (isGameLose(map)) {
+      setGameStatus('lose');
+      console.info('You lose!');
+    }
+  }, [keyPressed, map]);
 
   return (
     <div className='flex items-center justify-center h-screen'>
@@ -70,7 +116,7 @@ function App() {
               Array.from({ length: columnLength }, (_, columnIndex) => 
                 <div 
                 key={rowIndex * rowLength + columnIndex} 
-                className='aspect-square bg-gray-300 rounded-lg flex items-center justify-center text-3xl font-bold'>
+                className='aspect-square bg-gray-300 rounded flex items-center justify-center text-3xl font-extrabold'>
                   {map[rowIndex]?.[columnIndex]}
                 </div>
               )
