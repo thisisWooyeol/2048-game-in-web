@@ -2,13 +2,13 @@ import './App.css';
 
 import { useEffect, useState } from 'react';
 
-import { getRandomInitPos, getRandomPos, isGameLose, isGameWin,type Map2048, moveMapIn2048Rule, stringDirectionMap } from './Map2048';
+import { getRandomInitPos, getRandomPos, isGameLose, isGameWin, type Map2048, moveMapIn2048Rule, stringDirectionMap } from './Map2048';
 
 
 function App() {
   const rowLength: number = 4;
   const columnLength: number = 4;
-  const initPos: number[][] = getRandomInitPos(rowLength, columnLength);
+  const initPos: number[] = getRandomInitPos(rowLength, columnLength);
 
   const [keyPressed, setKeyPressed] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>('playing');
@@ -18,14 +18,12 @@ function App() {
       Array.from(
         { length: columnLength },
         (_, columnIndex) => {
-          if (initPos.some(pos => pos[0] === rowIndex && pos[1] === columnIndex)) {
-            return 2;
-          }
-          return null;
-        },
-        ),
-      )
-    );
+          return initPos.some(pos => 
+            pos === rowIndex * rowLength + columnIndex) ? 2 : null;
+       },
+      ),
+    )
+  );
 
   useEffect(() => {
     const handleKeyUp = (event: WindowEventMap['keyup']) => {
@@ -48,11 +46,11 @@ function App() {
       const {result, isMoved} = moveMapIn2048Rule(map, direction);
       // Update the map state if moved
       if (isMoved) {
-        const newBlockPos: [number, number] | null = getRandomPos(result);
+        const newBlockPos: number | null = getRandomPos(result);
         if (newBlockPos !== null) {
-          const [rowIndex, columnIndex] = newBlockPos;
-          result[rowIndex][columnIndex] = 2;
-          console.info(`New block at: ${rowIndex}, ${columnIndex}`);
+          const pos = newBlockPos;
+          result[Math.floor(pos / rowLength)][pos % columnLength] = 2;
+          console.info(`New block at: ${Math.floor(pos / rowLength)}, ${pos % columnLength}`);
         }
         setMap(result);
       }
@@ -99,8 +97,8 @@ function App() {
         {/* Game instructions */}
         <div className='grid grid-cols-4 gap-4'>
           <div className='col-span-3'>
-            Join the tiles, get to <strong>2048!</strong> <br />
-            Original game link at <a href='https://play2048.co/'style={{color: 'blue'}}>here!</a>
+            <p>Join the tiles, get to <strong>2048!</strong></p>
+            <p>Original game link at <a href='https://play2048.co/'style={{color: 'blue'}}>here!</a></p>
           </div>
           <div>
             <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
@@ -110,7 +108,7 @@ function App() {
         </div>
 
         {/* Game 2048 board */}
-        <div className='box-border w-full aspect-square p-4 bg-gray-400 rounded-lg'>
+        <div className='relative box-border w-full aspect-square p-4 bg-gray-400 rounded-lg'>
           <div className='grid grid-cols-4 grid-rows-4 gap-4'>
             {Array.from({ length: rowLength}, (_, rowIndex) =>
               Array.from({ length: columnLength }, (_, columnIndex) => 
@@ -122,6 +120,18 @@ function App() {
               )
             )}
           </div>
+
+          {/* Game status */}
+          {gameStatus === 'win' && 
+            <div className='absolute inset-0 bg-green-400 bg-opacity-50 rounded-lg flex items-center justify-center text-5xl font-extrabold'>
+              You Win!
+            </div>
+          }
+          {gameStatus === 'lose' &&
+            <div className='absolute inset-0 bg-red-400 bg-opacity-50 rounded-lg flex items-center justify-center text-5xl font-extrabold'>
+              You Lose! Try again?
+            </div>
+          }
         </div>
       </div>
     </div>

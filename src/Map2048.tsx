@@ -120,33 +120,31 @@ export const moveMapIn2048Rule = (
  * 2048 게임에서, Map의 2개의 초기 블록 위치를 반환하는 함수입니다.
  * @param rowLength Map의 행 길이
  * @param columnLength Map의 열 길이
- * @returns 2048 게임의 2개의 초기 블록 위치
+ * @returns (0, ... , rowLength * columnLength - 1)의 배열
  */
-export const getRandomInitPos = (rowLength: number, columnLength: number): number[][] => {
+export const getRandomInitPos = (rowLength: number, columnLength: number): number[] => {
   const firstPosition: number = Math.floor(Math.random() * rowLength * columnLength);
-  let secondPosition: number;
+  let tmp: number;
   do {
-    secondPosition = Math.floor(Math.random() * rowLength * columnLength);
-  } while (firstPosition === secondPosition);
+    tmp = Math.floor(Math.random() * rowLength * columnLength);
+  } while (firstPosition === tmp);
+  const secondPosition: number = tmp;
 
-  const firstRow: number = Math.floor(firstPosition / rowLength);
-  const firstColumn: number = firstPosition % rowLength;
-  const secondRow: number = Math.floor(secondPosition / rowLength);
-  const secondColumn: number = secondPosition % rowLength;
-  return [[firstRow, firstColumn], [secondRow, secondColumn]];
+  return [firstPosition, secondPosition];
 };
 
 /**
  * 2048 게임에서, Map에 랜덤한 위치에 블록을 놓을 수 있는지 확인하고, 가능하다면 랜덤한 위치를 반환하는 함수입니다.
  * @param map Map2048
- * @returns 신규 블록을 놓을 수 있는 랜덤한 위치 (행, 열) 또는 null
+ * @returns 신규 블록을 놓을 수 있는 랜덤한 위치 (0, rowLength * columnLength -1) 범위의 number 또는 null
  */
-export const getRandomPos = (map: Map2048): [number, number] | null => {
-  const emptyPositions: [number, number][] = [];
+export const getRandomPos = (map: Map2048): number | null => {
+  const rowLength = map.length;
+  const emptyPositions: number[] = [];
   map.forEach((row, rowIndex) => {
     row.forEach((cell, columnIndex) => {
       if (cell === null) {
-        emptyPositions.push([rowIndex, columnIndex]);
+        emptyPositions.push(rowIndex * rowLength + columnIndex);
       }
     });
   });
@@ -166,7 +164,7 @@ export const stringDirectionMap: Record<string, Direction> = {
 };
 
 export const isGameWin = (map: Map2048): boolean => {
-  const WINNING_SCORE = 2048;
+  const WINNING_SCORE = 128;
   return map.some(row => row.some(cell => cell === WINNING_SCORE));
 }
 
