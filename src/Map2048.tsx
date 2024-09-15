@@ -117,6 +117,25 @@ export const moveMapIn2048Rule = (
   type MoveResult = { result: Map2048; isMoved: boolean };
 
 /**
+ * 2048 게임에서, Map을 초기화하는 함수입니다.
+ * @param rowLength Map의 행 길이
+ * @param columnLength Map의 열 길이
+ * @returns columnLength * rowLength 크기의 2048 게임 Map
+ */
+export const resetMap = (rowLength: number, columnLength: number) : Map2048 => {
+  const initPos: number[] = getRandomInitPos(rowLength, columnLength);
+  return Array.from({ length: rowLength }, (_, rowIndex) =>
+    Array.from(
+      { length: columnLength },
+      (_, columnIndex) => {
+        return initPos.some(pos => 
+          pos === rowIndex * rowLength + columnIndex) ? 2 : null;
+      },
+    ),
+  );
+};
+
+/**
  * 2048 게임에서, Map의 2개의 초기 블록 위치를 반환하는 함수입니다.
  * @param rowLength Map의 행 길이
  * @param columnLength Map의 열 길이

@@ -2,28 +2,29 @@ import './App.css';
 
 import { useEffect, useState } from 'react';
 
-import { getRandomInitPos, getRandomPos, isGameLose, isGameWin, type Map2048, moveMapIn2048Rule, stringDirectionMap } from './Map2048';
+import { getRandomPos, isGameLose, isGameWin, type Map2048, moveMapIn2048Rule, resetMap, stringDirectionMap } from './Map2048';
 
 
 function App() {
   const rowLength: number = 4;
   const columnLength: number = 4;
-  const initPos: number[] = getRandomInitPos(rowLength, columnLength);
+  const [map, setMap] = useState<Map2048>(resetMap(rowLength, columnLength));
 
   const [keyPressed, setKeyPressed] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>('playing');
 
-  const [map, setMap] = useState<Map2048>(
-    Array.from({ length: rowLength }, (_, rowIndex) =>
-      Array.from(
-        { length: columnLength },
-        (_, columnIndex) => {
-          return initPos.some(pos => 
-            pos === rowIndex * rowLength + columnIndex) ? 2 : null;
-       },
-      ),
-    )
-  );
+  const newGameHandler = () => {
+    setMap(resetMap(rowLength, columnLength));
+    setGameStatus('playing');
+  };
+  const newGameButton = (text: string) => {
+    return (
+      <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
+      onClick={newGameHandler}>
+        {text}
+      </button>
+    );
+  };
 
   useEffect(() => {
     const handleKeyUp = (event: WindowEventMap['keyup']) => {
@@ -41,6 +42,9 @@ function App() {
   }, []);
 
   useEffect(() => {
+    // only move when gameState is playing
+    if (gameStatus !== 'playing') return;
+
     const direction = stringDirectionMap[keyPressed];
     if (direction !== undefined) {
       const {result, isMoved} = moveMapIn2048Rule(map, direction);
@@ -66,7 +70,7 @@ function App() {
       setGameStatus('lose');
       console.info('You lose!');
     }
-  }, [keyPressed, map]);
+  }, [gameStatus, keyPressed, map]);
 
   return (
     <div className='flex items-center justify-center h-screen'>
@@ -101,10 +105,8 @@ function App() {
             <p>Original game link at <a href='https://play2048.co/'style={{color: 'blue'}}>here!</a></p>
           </div>
           <div>
-            <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'>
-              New Game
-            </button>
-            </div>
+            {newGameButton('New Game')}
+          </div>
         </div>
 
         {/* Game 2048 board */}
@@ -123,13 +125,15 @@ function App() {
 
           {/* Game status */}
           {gameStatus === 'win' && 
-            <div className='absolute inset-0 bg-green-400 bg-opacity-50 rounded-lg flex items-center justify-center text-5xl font-extrabold'>
-              You Win!
+            <div className='absolute inset-0 bg-teal-300 bg-opacity-50 rounded-lg flex flex-col items-center justify-center'>
+              <p className='text-5xl font-extrabold mb-4'>You Win!</p>
+              {newGameButton('Play again?')}
             </div>
           }
           {gameStatus === 'lose' &&
-            <div className='absolute inset-0 bg-red-400 bg-opacity-50 rounded-lg flex items-center justify-center text-5xl font-extrabold'>
-              You Lose! Try again?
+            <div className='absolute inset-0 bg-red-300 bg-opacity-50 rounded-lg flex flex-col items-center justify-center'>
+              <p className='text-5xl font-extrabold mb-4'>You Lose!</p>
+              {newGameButton('Try again?')}
             </div>
           }
         </div>
