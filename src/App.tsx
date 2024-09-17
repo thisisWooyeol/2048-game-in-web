@@ -12,17 +12,30 @@ import {
   resetMap, 
   stringDirectionMap
 } from './Map2048';
+import {
+  loadGameState,
+  saveGameState,
+} from './utils/localStorage';
 
 
 function App() {
   const rowLength: number = 4;
   const columnLength: number = 4;
-  const [map, setMap] = useState<Map2048>(resetMap(rowLength, columnLength));
+
+  // Initialize state with data from Local Storage or start fresh
+  const initialState = loadGameState();
+  const [map, setMap] = useState<Map2048>(
+    initialState !== undefined ? initialState.map : resetMap(rowLength, columnLength)
+  );
+  const [score, setScore] = useState<number>(initialState !== undefined ? initialState.score : 0);
+  const [bestScore, setBestScore] = useState<number>(
+    initialState !== undefined ? initialState.bestScore : 0
+  );
+  const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>(
+    initialState !== undefined ? initialState.gameStatus : 'playing'
+  );
 
   const [keyPressed, setKeyPressed] = useState<string>('');
-  const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>('playing');
-  const [score, setScore] = useState<number>(0);
-  const [bestScore, setBestScore] = useState<number>(0);
 
   const newGameHandler = () => {
     setMap(resetMap(rowLength, columnLength));
@@ -93,6 +106,10 @@ function App() {
   useEffect(() => {
     setBestScore(prevBestScore => Math.max(prevBestScore, score));
   }, [score]);
+
+  useEffect(() => {
+    saveGameState({ map, score, bestScore, gameStatus });
+  }, [map, score, bestScore, gameStatus]);
 
   return (
     <div className='flex items-center justify-center h-screen'>
