@@ -21,10 +21,14 @@ function App() {
 
   const [keyPressed, setKeyPressed] = useState<string>('');
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>('playing');
+  const [score, setScore] = useState<number>(0);
+  const [bestScore, setBestScore] = useState<number>(0);
 
   const newGameHandler = () => {
     setMap(resetMap(rowLength, columnLength));
+    setScore(0);
     setGameStatus('playing');
+    console.info('New game started!');
   };
   const newGameButton = (text: string) => {
     return (
@@ -57,7 +61,7 @@ function App() {
 
     const direction = stringDirectionMap[keyPressed];
     if (direction !== undefined) {
-      const {result, isMoved} = moveMapIn2048Rule(map, direction);
+      const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
       // Update the map state if moved
       if (isMoved) {
         const newBlockPos: number | null = getRandomPos(result);
@@ -70,6 +74,7 @@ function App() {
           }
         }
         setMap(result);
+        setScore(prevScore => prevScore + newPoints);
       }
       setKeyPressed('');
 
@@ -85,6 +90,10 @@ function App() {
     }
   }, [gameStatus, keyPressed, map]);
 
+  useEffect(() => {
+    setBestScore(prevBestScore => Math.max(prevBestScore, score));
+  }, [score]);
+
   return (
     <div className='flex items-center justify-center h-screen'>
       <div className='grid grid-flow-row gap-2 max-w-lg'>
@@ -98,7 +107,7 @@ function App() {
               Score
             </div>
             <div>
-              0
+              {score}
             </div>
           </div>
           <div className='box-border border-2 border-black m-2'>
@@ -106,7 +115,7 @@ function App() {
               Best
             </div>
             <div>
-              0
+              {bestScore}
             </div>
           </div>
         </div>

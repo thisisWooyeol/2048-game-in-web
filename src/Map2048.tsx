@@ -12,11 +12,12 @@ export const moveMapIn2048Rule = (
   
     const rotatedMap = rotateMapCounterClockwise(map, rotateDegreeMap[direction]);
   
-    const { result, isMoved } = moveLeft(rotatedMap);
+    const { result, isMoved, newPoints } = moveLeft(rotatedMap);
   
     return {
       result: rotateMapCounterClockwise(result, revertDegreeMap[direction]),
       isMoved,
+      newPoints,
     };
   };
   
@@ -64,23 +65,24 @@ export const moveMapIn2048Rule = (
     const movedRows = map.map(moveRowLeft);
     const result = movedRows.map((movedRow) => movedRow.result);
     const isMoved = movedRows.some((movedRow) => movedRow.isMoved);
-    return { result, isMoved };
+    const newPoints = movedRows.reduce((acc, row) => acc + row.newPoints, 0);
+    return { result, isMoved, newPoints };
   };
   
-  const moveRowLeft = (row: Cell[]): { result: Cell[]; isMoved: boolean } => {
+  const moveRowLeft = (row: Cell[]): { result: Cell[]; isMoved: boolean, newPoints: number } => {
     const reduced = row.reduce(
-      (acc: { lastCell: Cell; result: Cell[] }, cell) => {
+      (acc: { newPoints: number; lastCell: Cell; result: Cell[] }, cell) => {
         if (cell === null) {
           return acc;
         } else if (acc.lastCell === null) {
           return { ...acc, lastCell: cell };
         } else if (acc.lastCell === cell) {
-          return { result: [...acc.result, cell * 2], lastCell: null };
+          return { result: [...acc.result, cell * 2], lastCell: null, newPoints: acc.newPoints + cell * 2 };
         } else {
-          return { result: [...acc.result, acc.lastCell], lastCell: cell };
+          return { result: [...acc.result, acc.lastCell], lastCell: cell, newPoints: acc.newPoints };
         }
       },
-      { lastCell: null, result: [] },
+      { newPoints: 0, lastCell: null, result: [] },
     );
   
     const result = [...reduced.result, reduced.lastCell];
@@ -92,6 +94,7 @@ export const moveMapIn2048Rule = (
     return {
       result: resultRow,
       isMoved: row.some((cell, i) => cell !== resultRow[i]),
+      newPoints: reduced.newPoints,
     };
   };
   
@@ -114,7 +117,7 @@ export const moveMapIn2048Rule = (
   type Direction = "up" | "left" | "right" | "down";
   type RotateDegree = 0 | 90 | 180 | 270;
   type DirectionDegreeMap = Record<Direction, RotateDegree>;
-  type MoveResult = { result: Map2048; isMoved: boolean };
+  type MoveResult = { result: Map2048; isMoved: boolean, newPoints: number };
 
 /**
  * 2048 게임에서, Map을 초기화하는 함수입니다.
