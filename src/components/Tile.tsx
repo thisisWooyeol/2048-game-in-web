@@ -3,7 +3,7 @@ import React from 'react';
 type TileProps = {
   value: number | null;
   getCellColor: (value: number | null) => string;
-}
+};
 
 export const Tile: React.FC<TileProps> = ({ value, getCellColor }) => {
   return (

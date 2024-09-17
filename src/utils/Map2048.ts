@@ -1,9 +1,13 @@
 type Cell = number | null;
 export type Map2048 = Cell[][];
-type Direction = "up" | "left" | "right" | "down";
+type Direction = 'up' | 'left' | 'right' | 'down';
 type RotateDegree = 0 | 90 | 180 | 270;
 type DirectionDegreeMap = Record<Direction, RotateDegree>;
-export type MoveResult = { result: Map2048; isMoved: boolean, newPoints: number };
+type MoveResult = {
+  result: Map2048;
+  isMoved: boolean;
+  newPoints: number;
+};
 
 const rotateDegreeMap: DirectionDegreeMap = {
   up: 90,
@@ -36,7 +40,8 @@ const rotateMapCounterClockwise = (
   degree: RotateDegree,
 ): Map2048 => {
   const rowLength = map.length;
-  const columnLength = map[0].length;
+  const columnLength = map[0]?.length ?? 0;
+  if (rowLength === 0 || columnLength === 0) return map;
 
   switch (degree) {
     case 0:
@@ -45,7 +50,8 @@ const rotateMapCounterClockwise = (
       return Array.from({ length: columnLength }, (_, columnIndex) =>
         Array.from(
           { length: rowLength },
-          (_, rowIndex) => map[rowIndex]?.[columnLength - columnIndex - 1] ?? null,
+          (_, rowIndex) =>
+            map[rowIndex]?.[columnLength - columnIndex - 1] ?? null,
         ),
       );
     case 180:
@@ -53,7 +59,8 @@ const rotateMapCounterClockwise = (
         Array.from(
           { length: columnLength },
           (_, columnIndex) =>
-            map[rowLength - rowIndex - 1]?.[columnLength - columnIndex - 1] ?? null,
+            map[rowLength - rowIndex - 1]?.[columnLength - columnIndex - 1] ??
+            null,
         ),
       );
     case 270:
@@ -74,7 +81,9 @@ const moveLeft = (map: Map2048): MoveResult => {
   return { result, isMoved, newPoints };
 };
 
-const moveRowLeft = (row: Cell[]): { result: Cell[]; isMoved: boolean, newPoints: number } => {
+const moveRowLeft = (
+  row: Cell[],
+): { result: Cell[]; isMoved: boolean; newPoints: number } => {
   const reduced = row.reduce(
     (acc: { newPoints: number; lastCell: Cell; result: Cell[] }, cell) => {
       if (cell === null) {
@@ -82,9 +91,17 @@ const moveRowLeft = (row: Cell[]): { result: Cell[]; isMoved: boolean, newPoints
       } else if (acc.lastCell === null) {
         return { ...acc, lastCell: cell };
       } else if (acc.lastCell === cell) {
-        return { result: [...acc.result, cell * 2], lastCell: null, newPoints: acc.newPoints + cell * 2 };
+        return {
+          result: [...acc.result, cell * 2],
+          lastCell: null,
+          newPoints: acc.newPoints + cell * 2,
+        };
       } else {
-        return { result: [...acc.result, acc.lastCell], lastCell: cell, newPoints: acc.newPoints };
+        return {
+          result: [...acc.result, acc.lastCell],
+          lastCell: cell,
+          newPoints: acc.newPoints,
+        };
       }
     },
     { newPoints: 0, lastCell: null, result: [] },
@@ -113,7 +130,7 @@ export const moveMapIn2048Rule = (
   map: Map2048,
   direction: Direction,
 ): MoveResult => {
-  if (!validateMapIsNByM(map)) throw new Error("Map is not N by M");
+  if (!validateMapIsNByM(map)) throw new Error('Map is not N by M');
 
   const rotatedMap = rotateMapCounterClockwise(map, rotateDegreeMap[direction]);
 
@@ -132,7 +149,7 @@ export const moveMapIn2048Rule = (
  * @returns 가능하다면 랜덤한 위치에 블록이 추가된 Map
  */
 export const addRandomBlock = (map: Map2048): Map2048 => {
-  const emptyCells: { _row: number, _col: number }[] = [];
+  const emptyCells: { _row: number; _col: number }[] = [];
 
   map.forEach((row, rowIndex) => {
     row.forEach((cell, colIndex) => {
@@ -144,23 +161,23 @@ export const addRandomBlock = (map: Map2048): Map2048 => {
   const randomIndex = Math.floor(Math.random() * emptyCells.length);
   const randomCell = emptyCells[randomIndex];
   if (randomCell === undefined) return map;
-  
+
   const { _row, _col } = randomCell;
-  const updatedMap = map.map((row, rowIndex) => 
+  const updatedMap = map.map((row, rowIndex) =>
     row.map((cell, colIndex) => {
-      return (rowIndex === _row && colIndex === _col) ? 2 : cell;
-    })
+      return rowIndex === _row && colIndex === _col ? 2 : cell;
+    }),
   );
   return updatedMap;
-}
-  
+};
+
 /**
  * 2048 게임에서, Map을 초기화하는 함수입니다.
  * @param rowLength Map의 행 길이
  * @param columnLength Map의 열 길이
  * @returns columnLength * rowLength 크기의 2048 게임 Map
  */
-export const resetMap = (rowLength: number, columnLength: number) : Map2048 => {
+export const resetMap = (rowLength: number, columnLength: number): Map2048 => {
   const map: Map2048 = Array.from({ length: rowLength }, () => {
     return Array.from({ length: columnLength }, () => null);
   });
@@ -169,19 +186,19 @@ export const resetMap = (rowLength: number, columnLength: number) : Map2048 => {
 
 export const isGameWin = (map: Map2048): boolean => {
   const WINNING_SCORE = 128;
-  return map.some(row => row.some(cell => cell === WINNING_SCORE));
-}
+  return map.some((row) => row.some((cell) => cell === WINNING_SCORE));
+};
 
 export const isGameLose = (map: Map2048): boolean => {
-  const isFull = map.every(row => row.every(cell => cell !== null));
+  const isFull = map.every((row) => row.every((cell) => cell !== null));
   if (!isFull) return false;
 
-  const isMovable = Object.values(stringDirectionMap).some(direction => {
+  const isMovable = Object.values(stringDirectionMap).some((direction) => {
     const { isMoved } = moveMapIn2048Rule(map, direction);
     return isMoved;
   });
   return !isMovable;
-}
+};
 
 export const getCellColor = (value: Cell | undefined): string => {
   switch (value) {

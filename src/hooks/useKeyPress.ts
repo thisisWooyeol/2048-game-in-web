@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect } from 'react';
 
 const ARROW_KEYS = ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
 
@@ -13,7 +13,7 @@ export const useKeyPress = (handler: (key: string) => void) => {
       if (ARROW_KEYS.includes(event.key)) {
         handler(event.key);
       }
-    }
+    };
 
     window.addEventListener('keydown', handleKeyDown);
     window.addEventListener('keyup', handleKeyUp);
