@@ -1,11 +1,12 @@
 import './App.css';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { GameBoard } from './components/GameBoard';
 import { GameInstructions } from './components/GameInstructions';
 import { GameStatusOverlay } from './components/GameStatusOverlay';
 import { Header } from './components/Header';
+import { useKeyPress } from './hooks/useKeyPress';
 import {
   loadGameState,
   saveGameState,
@@ -41,66 +42,52 @@ function App() {
 
   const [keyPressed, setKeyPressed] = useState<string>('');
 
-  const newGameHandler = () => {
+
+  // Event Handlers
+  const newGameHandler = useCallback(() => {
     setMap(resetMap(rowLength, columnLength));
     setScore(0);
     setGameStatus('playing');
     console.info('New game started!');
-  };
-  const newGameButton = (text: string) => {
+  }, []);
+  const newGameButton = useCallback((text: string) => {
     return (
       <button className='bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded'
       onClick={newGameHandler}>
         {text}
       </button>
     );
-  };
+  }, [newGameHandler]);
 
-  useEffect(() => {
-    const handleKeyDown = (event: WindowEventMap['keydown']) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        event.preventDefault();
-      }
-    };
-    const handleKeyUp = (event: WindowEventMap['keyup']) => {
-      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
-        setKeyPressed(event.key);
-        console.debug(`Arrow key pressed: ${event.key}`);
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown);
-    window.addEventListener('keyup', handleKeyUp);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      window.removeEventListener('keyup', handleKeyUp);
-    };
+  const keyPressHandler = useCallback((key: string) => {
+    setKeyPressed(key);
+    console.debug(`Arrow key pressed: ${key}`);
   }, []);
+  useKeyPress(keyPressHandler);
 
   useEffect(() => {
     // only move when gameState is playing
-    if (gameStatus !== 'playing') return;
+    if (gameStatus !== 'playing' || keyPressed === '') return;
 
     const direction = stringDirectionMap[keyPressed];
-    if (direction !== undefined) {
-      const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
-      // Update the map state if moved
-      if (isMoved) {
-        setMap(addRandomBlock(result));
-        setScore(prevScore => prevScore + newPoints);
-      }
-      setKeyPressed('');
+    if (direction === undefined) return;
+    
+    const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
+    if (isMoved) {
+      const updatedMap: Map2048 = addRandomBlock(result);
+      setMap(updatedMap);
+      setScore(prevScore => prevScore + newPoints);
+    }
+    // Reset keyPressed state after handling
+    setKeyPressed('');
 
-      // check if the game is over
-      if (isGameWin(result)) {
-        setGameStatus('win');
-        console.info('You win!');
-      }
-      else if (isGameLose(result)) {
-        setGameStatus('lose');
-        console.info('You lose!');
-      }
+    // check if the game is over
+    if (isGameWin(result)) {
+      setGameStatus('win');
+      console.info('You win!');
+    } else if (isGameLose(result)) {
+      setGameStatus('lose');
+      console.info('You lose!');
     }
   }, [gameStatus, keyPressed, map]);
 
@@ -111,6 +98,7 @@ function App() {
   useEffect(() => {
     saveGameState({ map, score, bestScore, gameStatus });
   }, [map, score, bestScore, gameStatus]);
+
 
   return (
     <div className='flex items-center justify-center min-h-screen'>
