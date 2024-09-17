@@ -2,7 +2,16 @@ import './App.css';
 
 import { useEffect, useState } from 'react';
 
-import { getRandomPos, isGameLose, isGameWin, type Map2048, moveMapIn2048Rule, resetMap, stringDirectionMap } from './Map2048';
+import { 
+  getCellColor,
+  getRandomPos, 
+  isGameLose, 
+  isGameWin, 
+  type Map2048, 
+  moveMapIn2048Rule, 
+  resetMap, 
+  stringDirectionMap
+} from './Map2048';
 
 
 function App() {
@@ -27,17 +36,18 @@ function App() {
   };
 
   useEffect(() => {
-    const handleKeyUp = (event: WindowEventMap['keyup']) => {
+    const handleKeyUp = (event: WindowEventMap['keydown']) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
+        event.preventDefault();
         setKeyPressed(event.key);
-        console.info(`Arrow key pressed: ${event.key}`);
+        console.debug(`Arrow key pressed: ${event.key}`);
       }
     };
 
-    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('keydown', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyUp);
     };
   }, []);
 
@@ -53,22 +63,25 @@ function App() {
         const newBlockPos: number | null = getRandomPos(result);
         if (newBlockPos !== null) {
           const pos = newBlockPos;
-          result[Math.floor(pos / rowLength)][pos % columnLength] = 2;
-          console.info(`New block at: ${Math.floor(pos / rowLength)}, ${pos % columnLength}`);
+          const row = result[Math.floor(pos / rowLength)];
+          if (row !== undefined) {
+            row[pos % columnLength] = 2;
+            console.debug(`New block at: ${Math.floor(pos / rowLength)}, ${pos % columnLength}`);
+          }
         }
         setMap(result);
       }
-    }
-    setKeyPressed('');
-    
-    // check if the game is over
-    if (isGameWin(map)) {
-      setGameStatus('win');
-      console.info('You win!');
-    }
-    else if (isGameLose(map)) {
-      setGameStatus('lose');
-      console.info('You lose!');
+      setKeyPressed('');
+
+      // check if the game is over
+      if (isGameWin(result)) {
+        setGameStatus('win');
+        console.info('You win!');
+      }
+      else if (isGameLose(result)) {
+        setGameStatus('lose');
+        console.info('You lose!');
+      }
     }
   }, [gameStatus, keyPressed, map]);
 
@@ -113,13 +126,18 @@ function App() {
         <div className='relative box-border w-full aspect-square p-4 bg-gray-400 rounded-lg'>
           <div className='grid grid-cols-4 grid-rows-4 gap-4'>
             {Array.from({ length: rowLength}, (_, rowIndex) =>
-              Array.from({ length: columnLength }, (_, columnIndex) => 
-                <div 
-                key={rowIndex * rowLength + columnIndex} 
-                className='aspect-square bg-gray-300 rounded flex items-center justify-center text-3xl font-extrabold'>
-                  {map[rowIndex]?.[columnIndex]}
-                </div>
-              )
+              Array.from({ length: columnLength }, (_, columnIndex) => {
+                const cellValue = map[rowIndex]?.[columnIndex];
+                return (
+                  <div
+                    key={rowIndex * rowLength + columnIndex}
+                    className={`aspect-square rounded flex items-center justify-center text-3xl font-extrabold 
+                      ${getCellColor(cellValue)} transition-colors duration-300`}
+                  >
+                    {cellValue}
+                  </div>
+                );
+              })
             )}
           </div>
 
@@ -132,7 +150,7 @@ function App() {
           }
           {gameStatus === 'lose' &&
             <div className='absolute inset-0 bg-red-300 bg-opacity-50 rounded-lg flex flex-col items-center justify-center'>
-              <p className='text-5xl font-extrabold mb-4'>You Lose!</p>
+              <p className='text-5xl font-extrabold mb-4'>Game Over!</p>
               {newGameButton('Try again?')}
             </div>
           }
