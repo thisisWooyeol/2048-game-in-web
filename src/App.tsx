@@ -2,6 +2,14 @@ import './App.css';
 
 import { useEffect, useState } from 'react';
 
+import { GameBoard } from './components/GameBoard';
+import { GameInstructions } from './components/GameInstructions';
+import { GameStatusOverlay } from './components/GameStatusOverlay';
+import { Header } from './components/Header';
+import {
+  loadGameState,
+  saveGameState,
+} from './utils/localStorage';
 import { 
   getCellColor,
   getRandomPos, 
@@ -11,11 +19,7 @@ import {
   moveMapIn2048Rule, 
   resetMap, 
   stringDirectionMap
-} from './Map2048';
-import {
-  loadGameState,
-  saveGameState,
-} from './utils/localStorage';
+} from './utils/Map2048';
 
 
 function App() {
@@ -114,78 +118,17 @@ function App() {
   return (
     <div className='flex items-center justify-center h-screen'>
       <div className='grid grid-flow-row gap-5 max-w-lg'>
-        {/* Header */}
-        <div className='flex flex-col sm:flex-row justify-between items-center w-full space-y-2'>
-          {/* Game Title */}
-          <div className='font-sans font-extrabold text-7xl'>
-            2048
-          </div>
+        <Header score={score} bestScore={bestScore} />
+        <GameInstructions newGameButton={newGameButton('New Game')} />
 
-          {/* Score and Best Score Container */}
-          <div className='flex space-x-4'>
-            {/* Score Block */}
-            <div className='flex flex-col items-center bg-gray-200 rounded-lg shadow-md p-4'>
-              <div className='text-sm font-semibold text-gray-700'>
-                SCORE
-              </div>
-              <div className='text-2xl font-bold text-gray-900'>
-                {score}
-              </div>
-            </div>
-            {/* Best Score Block */}
-            <div className='flex flex-col items-center bg-gray-200 rounded-lg shadow-md p-4'>
-              <div className='text-sm font-semibold text-gray-700'>
-                BEST
-              </div>
-              <div className='text-2xl font-bold text-gray-900'>
-                {bestScore}
-              </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Game instructions */}
-        <div className='grid grid-cols-4 gap-4'>
-          <div className='col-span-3'>
-            <p>Join the tiles, get to <strong>2048!</strong></p>
-            <p>Original game link at <a href='https://play2048.co/'style={{color: 'blue'}}>here!</a></p>
-          </div>
-          <div>
-            {newGameButton('New Game')}
-          </div>
-        </div>
-
-        {/* Game 2048 board */}
         <div className='relative box-border w-full aspect-square p-4 bg-gray-400 rounded-lg'>
-          <div className='grid grid-cols-4 grid-rows-4 gap-4'>
-            {Array.from({ length: rowLength}, (_, rowIndex) =>
-              Array.from({ length: columnLength }, (_, columnIndex) => {
-                const cellValue = map[rowIndex]?.[columnIndex];
-                return (
-                  <div
-                    key={rowIndex * rowLength + columnIndex}
-                    className={`aspect-square rounded flex items-center justify-center text-3xl font-extrabold 
-                      ${getCellColor(cellValue)} transition-colors duration-300`}
-                  >
-                    {cellValue}
-                  </div>
-                );
-              })
-            )}
-          </div>
-
-          {/* Game status */}
-          {gameStatus === 'win' && 
-            <div className='absolute inset-0 bg-teal-300 bg-opacity-50 rounded-lg flex flex-col items-center justify-center'>
-              <p className='text-5xl font-extrabold mb-4'>You Win!</p>
-              {newGameButton('Play again?')}
-            </div>
+          <GameBoard map={map} getCellColor={getCellColor} />
+          {/* Game Status Overlays */}
+          { gameStatus === 'win' &&
+            <GameStatusOverlay status='win' newGameButton={newGameButton('Play Again?')} />
           }
-          {gameStatus === 'lose' &&
-            <div className='absolute inset-0 bg-red-300 bg-opacity-50 rounded-lg flex flex-col items-center justify-center'>
-              <p className='text-5xl font-extrabold mb-4'>Game Over!</p>
-              {newGameButton('Try again?')}
-            </div>
+          { gameStatus === 'lose' &&
+            <GameStatusOverlay status='lose' newGameButton={newGameButton('Try Again?')} />
           }
         </div>
       </div>

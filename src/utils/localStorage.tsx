@@ -1,4 +1,4 @@
-import { type Map2048 } from '../Map2048';
+import { type Map2048 } from './Map2048';
 
 export const loadGameState = (): {
   map: Map2048;
