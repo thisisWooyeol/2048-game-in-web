@@ -11,14 +11,14 @@ import {
   saveGameState,
 } from './utils/localStorage';
 import { 
+  addRandomBlock,
   getCellColor,
-  getRandomPos, 
   isGameLose, 
   isGameWin, 
   type Map2048, 
   moveMapIn2048Rule, 
   resetMap, 
-  stringDirectionMap
+  stringDirectionMap,
 } from './utils/Map2048';
 
 
@@ -57,18 +57,24 @@ function App() {
   };
 
   useEffect(() => {
-    const handleKeyUp = (event: WindowEventMap['keydown']) => {
+    const handleKeyDown = (event: WindowEventMap['keydown']) => {
       if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
         event.preventDefault();
+      }
+    };
+    const handleKeyUp = (event: WindowEventMap['keyup']) => {
+      if (['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].includes(event.key)) {
         setKeyPressed(event.key);
         console.debug(`Arrow key pressed: ${event.key}`);
       }
-    };
+    }
 
-    window.addEventListener('keydown', handleKeyUp);
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
 
     return () => {
-      window.removeEventListener('keydown', handleKeyUp);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
     };
   }, []);
 
@@ -81,16 +87,7 @@ function App() {
       const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
       // Update the map state if moved
       if (isMoved) {
-        const newBlockPos: number | null = getRandomPos(result);
-        if (newBlockPos !== null) {
-          const pos = newBlockPos;
-          const row = result[Math.floor(pos / rowLength)];
-          if (row !== undefined) {
-            row[pos % columnLength] = 2;
-            console.debug(`New block at: ${Math.floor(pos / rowLength)}, ${pos % columnLength}`);
-          }
-        }
-        setMap(result);
+        setMap(addRandomBlock(result));
         setScore(prevScore => prevScore + newPoints);
       }
       setKeyPressed('');
@@ -116,8 +113,8 @@ function App() {
   }, [map, score, bestScore, gameStatus]);
 
   return (
-    <div className='flex items-center justify-center h-screen'>
-      <div className='grid grid-flow-row gap-5 max-w-lg'>
+    <div className='flex items-center justify-center min-h-screen'>
+      <div className='grid grid-flow-row gap-5 max-w-lg w-full'>
         <Header score={score} bestScore={bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
 
