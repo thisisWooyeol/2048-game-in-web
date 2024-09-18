@@ -24,23 +24,20 @@ function App() {
   const columnLength: number = 4;
 
   // Initialize state with data from Local Storage or start fresh
-  const initialState = loadGameState();
-  const [map, setMap] = useState<Map2048>(
-    initialState !== undefined
-      ? initialState.map
-      : resetMap(rowLength, columnLength),
+  const [map, setMap] = useState<Map2048>(() =>
+    loadGameState()?.map ?? resetMap(rowLength, columnLength)
   );
   const [score, setScore] = useState<number>(
-    initialState !== undefined ? initialState.score : 0,
+    loadGameState()?.score ?? 0
   );
   const [bestScore, setBestScore] = useState<number>(
-    initialState !== undefined ? initialState.bestScore : 0,
+    loadGameState()?.bestScore ?? 0
   );
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>(
-    initialState !== undefined ? initialState.gameStatus : 'playing',
+    loadGameState()?.gameStatus ?? 'playing'
   );
 
-  const [keyPressed, setKeyPressed] = useState<string>('');
+  const [keyPressed, setKeyPressed] = useState('');
 
   // Event Handlers
   const newGameHandler = useCallback(() => {
