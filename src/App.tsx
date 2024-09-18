@@ -35,7 +35,9 @@ function App() {
     loadGameState()?.gameStatus ?? 'playing',
   );
 
-  const [keyPressed, setKeyPressed] = useState('');
+  useEffect(() => {
+    saveGameState({ map, score, bestScore, gameStatus });
+  }, [map, score, bestScore, gameStatus]);
 
   // Event Handlers
   const newGameHandler = () => {
@@ -55,45 +57,37 @@ function App() {
     );
   };
 
-  const keyPressHandler = useCallback((key: string) => {
-    setKeyPressed(key);
-    console.debug(`Arrow key pressed: ${key}`);
-  }, []);
+  const keyPressHandler = useCallback(
+    (key: string) => {
+      if (gameStatus !== 'playing') return;
+      console.debug('Key Pressed:', key);
+
+      const direction = stringDirectionMap[key];
+      if (direction === undefined) return;
+
+      const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
+      if (isMoved) {
+        const updatedMap: Map2048 = addRandomBlock(result);
+        setMap(updatedMap);
+        setScore((prevScore) => prevScore + newPoints);
+        setBestScore((prevBestScore) =>
+          Math.max(prevBestScore, score + newPoints),
+        );
+
+        // check if the game is over
+        if (isGameWin(updatedMap)) {
+          setGameStatus('win');
+          console.info('You win!');
+        } else if (isGameLose(updatedMap)) {
+          setGameStatus('lose');
+          console.info('You lose!');
+        }
+      }
+    },
+    [gameStatus, map, score],
+  );
+
   useKeyPress(keyPressHandler);
-
-  useEffect(() => {
-    // only move when gameState is playing
-    if (gameStatus !== 'playing' || keyPressed === '') return;
-
-    const direction = stringDirectionMap[keyPressed];
-    if (direction === undefined) return;
-
-    const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
-    if (isMoved) {
-      const updatedMap: Map2048 = addRandomBlock(result);
-      setMap(updatedMap);
-      setScore((prevScore) => prevScore + newPoints);
-    }
-    // Reset keyPressed state after handling
-    setKeyPressed('');
-
-    // check if the game is over
-    if (isGameWin(result)) {
-      setGameStatus('win');
-      console.info('You win!');
-    } else if (isGameLose(result)) {
-      setGameStatus('lose');
-      console.info('You lose!');
-    }
-  }, [gameStatus, keyPressed, map]);
-
-  useEffect(() => {
-    setBestScore((prevBestScore) => Math.max(prevBestScore, score));
-  }, [score]);
-
-  useEffect(() => {
-    saveGameState({ map, score, bestScore, gameStatus });
-  }, [map, score, bestScore, gameStatus]);
 
   return (
     <div className="flex items-center justify-center min-h-screen">
