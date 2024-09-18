@@ -5,10 +5,10 @@ type GameStatusOverlayProps = {
   newGameButton: React.ReactNode;
 };
 
-export const GameStatusOverlay: React.FC<GameStatusOverlayProps> = ({
+export const GameStatusOverlay = ({
   status,
   newGameButton,
-}) => {
+}: GameStatusOverlayProps) => {
   const isWin = status === 'win';
   const bgColor = isWin
     ? 'bg-teal-300 bg-opacity-50'

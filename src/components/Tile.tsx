@@ -1,11 +1,9 @@
-import React from 'react';
-
 type TileProps = {
   value: number | null;
   getCellColor: (value: number | null) => string;
 };
 
-export const Tile: React.FC<TileProps> = ({ value, getCellColor }) => {
+export const Tile = ({ value, getCellColor }: TileProps) => {
   return (
     <div
       className={`aspect-square rounded flex items-center justify-center text-3xl font-extrabold 

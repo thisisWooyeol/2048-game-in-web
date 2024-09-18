@@ -1,5 +1,3 @@
-import React from 'react';
-
 import { type Map2048 } from '../utils/Map2048';
 import { Tile } from './Tile';
 
@@ -8,7 +6,7 @@ type GameBoardProps = {
   getCellColor: (value: number | null) => string;
 };
 
-export const GameBoard: React.FC<GameBoardProps> = ({ map, getCellColor }) => {
+export const GameBoard = ({ map, getCellColor }: GameBoardProps) => {
   return (
     <div className="grid grid-cols-4 grid-rows-4 gap-4">
       {map.map((row, rowIndex) =>

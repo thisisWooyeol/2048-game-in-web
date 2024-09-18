@@ -1,11 +1,9 @@
-import React from 'react';
-
 type HeaderProps = {
   score: number;
   bestScore: number;
 };
 
-export const Header: React.FC<HeaderProps> = ({ score, bestScore }) => {
+export const Header = ({ score, bestScore }: HeaderProps) => {
   return (
     <div className="flex flex-col sm:flex-row justify-between items-center w-full space-y-2">
       {/* Game Title */}
