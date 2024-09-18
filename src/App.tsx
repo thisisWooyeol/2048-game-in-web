@@ -24,41 +24,36 @@ function App() {
   const columnLength: number = 4;
 
   // Initialize state with data from Local Storage or start fresh
-  const [map, setMap] = useState<Map2048>(() =>
-    loadGameState()?.map ?? resetMap(rowLength, columnLength)
+  const [map, setMap] = useState<Map2048>(
+    () => loadGameState()?.map ?? resetMap(rowLength, columnLength),
   );
-  const [score, setScore] = useState<number>(
-    loadGameState()?.score ?? 0
-  );
+  const [score, setScore] = useState<number>(loadGameState()?.score ?? 0);
   const [bestScore, setBestScore] = useState<number>(
-    loadGameState()?.bestScore ?? 0
+    loadGameState()?.bestScore ?? 0,
   );
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>(
-    loadGameState()?.gameStatus ?? 'playing'
+    loadGameState()?.gameStatus ?? 'playing',
   );
 
   const [keyPressed, setKeyPressed] = useState('');
 
   // Event Handlers
-  const newGameHandler = useCallback(() => {
+  const newGameHandler = () => {
     setMap(resetMap(rowLength, columnLength));
     setScore(0);
     setGameStatus('playing');
     console.info('New game started!');
-  }, []);
-  const newGameButton = useCallback(
-    (text: string) => {
-      return (
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={newGameHandler}
-        >
-          {text}
-        </button>
-      );
-    },
-    [newGameHandler],
-  );
+  };
+  const newGameButton = (text: string) => {
+    return (
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={newGameHandler}
+      >
+        {text}
+      </button>
+    );
+  };
 
   const keyPressHandler = useCallback((key: string) => {
     setKeyPressed(key);
