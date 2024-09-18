@@ -28,6 +28,10 @@ export const stringDirectionMap: Record<string, Direction> = {
   ArrowRight: 'right',
   ArrowDown: 'down',
   ArrowLeft: 'left',
+  w: 'up',
+  d: 'right',
+  s: 'down',
+  a: 'left',
 };
 
 const validateMapIsNByM = (map: Map2048) => {
