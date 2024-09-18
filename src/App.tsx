@@ -24,84 +24,70 @@ function App() {
   const columnLength: number = 4;
 
   // Initialize state with data from Local Storage or start fresh
-  const initialState = loadGameState();
   const [map, setMap] = useState<Map2048>(
-    initialState !== undefined
-      ? initialState.map
-      : resetMap(rowLength, columnLength),
+    () => loadGameState()?.map ?? resetMap(rowLength, columnLength),
   );
-  const [score, setScore] = useState<number>(
-    initialState !== undefined ? initialState.score : 0,
-  );
+  const [score, setScore] = useState<number>(loadGameState()?.score ?? 0);
   const [bestScore, setBestScore] = useState<number>(
-    initialState !== undefined ? initialState.bestScore : 0,
+    loadGameState()?.bestScore ?? 0,
   );
   const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>(
-    initialState !== undefined ? initialState.gameStatus : 'playing',
+    loadGameState()?.gameStatus ?? 'playing',
   );
-
-  const [keyPressed, setKeyPressed] = useState<string>('');
-
-  // Event Handlers
-  const newGameHandler = useCallback(() => {
-    setMap(resetMap(rowLength, columnLength));
-    setScore(0);
-    setGameStatus('playing');
-    console.info('New game started!');
-  }, []);
-  const newGameButton = useCallback(
-    (text: string) => {
-      return (
-        <button
-          className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-          onClick={newGameHandler}
-        >
-          {text}
-        </button>
-      );
-    },
-    [newGameHandler],
-  );
-
-  const keyPressHandler = useCallback((key: string) => {
-    setKeyPressed(key);
-    console.debug(`Arrow key pressed: ${key}`);
-  }, []);
-  useKeyPress(keyPressHandler);
-
-  useEffect(() => {
-    // only move when gameState is playing
-    if (gameStatus !== 'playing' || keyPressed === '') return;
-
-    const direction = stringDirectionMap[keyPressed];
-    if (direction === undefined) return;
-
-    const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
-    if (isMoved) {
-      const updatedMap: Map2048 = addRandomBlock(result);
-      setMap(updatedMap);
-      setScore((prevScore) => prevScore + newPoints);
-    }
-    // Reset keyPressed state after handling
-    setKeyPressed('');
-
-    // check if the game is over
-    if (isGameWin(result)) {
-      setGameStatus('win');
-      console.info('You win!');
-    } else if (isGameLose(result)) {
-      setGameStatus('lose');
-      console.info('You lose!');
-    }
-  }, [gameStatus, keyPressed, map]);
-
-  useEffect(() => {
-    setBestScore((prevBestScore) => Math.max(prevBestScore, score));
-  }, [score]);
 
   useEffect(() => {
     saveGameState({ map, score, bestScore, gameStatus });
   }, [map, score, bestScore, gameStatus]);
+
+  // Event Handlers
+  const newGameHandler = () => {
+    setMap(resetMap(rowLength, columnLength));
+    setScore(0);
+    setGameStatus('playing');
+    console.info('New game started!');
+  };
+  const newGameButton = (text: string) => {
+    return (
+      <button
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        onClick={newGameHandler}
+      >
+        {text}
+      </button>
+    );
+  };
+
+  const keyPressHandler = useCallback(
+    (key: string) => {
+      if (gameStatus !== 'playing') return;
+      console.debug('Key Pressed:', key);
+
+      const direction = stringDirectionMap[key];
+      if (direction === undefined) return;
+
+      const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
+      if (isMoved) {
+        const updatedMap: Map2048 = addRandomBlock(result);
+        setMap(updatedMap);
+        setScore((prevScore) => prevScore + newPoints);
+        setBestScore((prevBestScore) =>
+          Math.max(prevBestScore, score + newPoints),
+        );
+
+        // check if the game is over
+        if (isGameWin(updatedMap)) {
+          setGameStatus('win');
+          console.info('You win!');
+        } else if (isGameLose(updatedMap)) {
+          setGameStatus('lose');
+          console.info('You lose!');
+        }
+      }
+    },
+    [gameStatus, map, score],
+  );
+
+  useKeyPress(keyPressHandler);
 
   return (
     <div className="flex items-center justify-center min-h-screen">

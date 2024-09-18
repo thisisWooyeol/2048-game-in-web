@@ -4,9 +4,7 @@ type GameInstructionsProps = {
   newGameButton: React.ReactNode;
 };
 
-export const GameInstructions: React.FC<GameInstructionsProps> = ({
-  newGameButton,
-}) => {
+export const GameInstructions = ({ newGameButton }: GameInstructionsProps) => {
   return (
     <div className="grid grid-cols-4 gap-4 items-center">
       <div className="col-span-3 text-left">
