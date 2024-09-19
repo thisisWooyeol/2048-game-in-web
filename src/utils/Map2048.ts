@@ -189,7 +189,7 @@ export const resetMap = (rowLength: number, columnLength: number): Map2048 => {
 };
 
 export const isGameWin = (map: Map2048): boolean => {
-  const WINNING_SCORE = 128;
+  const WINNING_SCORE = 2048;
   return map.some((row) => row.some((cell) => cell === WINNING_SCORE));
 };
 
