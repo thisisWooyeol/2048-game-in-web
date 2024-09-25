@@ -1,5 +1,6 @@
 import './App.css';
 
+import { SpeedInsights } from '@vercel/speed-insights/react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { GameBoard } from './components/GameBoard';
@@ -112,6 +113,7 @@ function App() {
           )}
         </div>
       </div>
+      <SpeedInsights />
     </div>
   );
 }
