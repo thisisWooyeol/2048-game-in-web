@@ -1,4 +1,5 @@
-import './App.css';
+import './reset.css';
+import './tailwind.css';
 
 import { useCallback, useEffect, useState } from 'react';
 
@@ -90,7 +91,7 @@ function App() {
   useKeyPress(keyPressHandler);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center h-dvh max-w-7xl p-8">
       <div className="grid grid-flow-row gap-5 max-w-lg w-full">
         <Header score={score} bestScore={bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
