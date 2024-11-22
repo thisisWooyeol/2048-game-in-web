@@ -49,7 +49,7 @@ export const App = () => {
   const newGameButton = (text: string) => {
     return (
       <button
-        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
         onClick={newGameHandler}
       >
         {text}
@@ -90,12 +90,12 @@ export const App = () => {
   useKeyPress(keyPressHandler);
 
   return (
-    <div className="flex items-center justify-center h-dvh max-w-7xl p-8">
-      <div className="grid grid-flow-row gap-5 max-w-lg w-full">
+    <div className="flex h-dvh max-w-7xl items-center justify-center p-8">
+      <div className="grid w-full max-w-lg grid-flow-row gap-5">
         <Header score={score} bestScore={bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
 
-        <div className="relative box-border w-full aspect-square p-4 bg-gray-400 rounded-lg">
+        <div className="relative box-border aspect-square w-full rounded-lg bg-gray-400 p-4">
           <GameBoard map={map} />
           {/* Game Status Overlays */}
           {gameStatus === 'win' && (
