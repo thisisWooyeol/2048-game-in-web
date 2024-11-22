@@ -1,13 +1,14 @@
-import './App.css';
+import './reset.css';
+import './tailwind.css';
 
 import { useCallback, useEffect, useState } from 'react';
 
-import { GameBoard } from './components/GameBoard';
-import { GameInstructions } from './components/GameInstructions';
-import { GameStatusOverlay } from './components/GameStatusOverlay';
-import { Header } from './components/Header';
-import { useKeyPress } from './hooks/useKeyPress';
-import { loadGameState, saveGameState } from './utils/localStorage';
+import { GameBoard } from '@/components/GameBoard';
+import { GameInstructions } from '@/components/GameInstructions';
+import { GameStatusOverlay } from '@/components/GameStatusOverlay';
+import { Header } from '@/components/Header';
+import { useKeyPress } from '@/hooks/useKeyPress';
+import { loadGameState, saveGameState } from '@/utils/localStorage';
 import {
   addRandomBlock,
   getCellColor,
@@ -17,9 +18,9 @@ import {
   moveMapIn2048Rule,
   resetMap,
   stringDirectionMap,
-} from './utils/Map2048';
+} from '@/utils/Map2048';
 
-function App() {
+export const App = () => {
   const rowLength: number = 4;
   const columnLength: number = 4;
 
@@ -90,7 +91,7 @@ function App() {
   useKeyPress(keyPressHandler);
 
   return (
-    <div className="flex items-center justify-center min-h-screen">
+    <div className="flex items-center justify-center h-dvh max-w-7xl p-8">
       <div className="grid grid-flow-row gap-5 max-w-lg w-full">
         <Header score={score} bestScore={bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
@@ -114,6 +115,4 @@ function App() {
       </div>
     </div>
   );
-}
-
-export default App;
+};
