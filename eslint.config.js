@@ -7,6 +7,7 @@ export default [
       '.yarn',
       'postcss.config.js',
       'tailwind.config.js',
+      'dist/**',
     ],
   },
   ...react({
