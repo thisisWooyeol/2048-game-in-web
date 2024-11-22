@@ -11,7 +11,6 @@ import { useKeyPress } from '@/hooks/useKeyPress';
 import { loadGameState, saveGameState } from '@/utils/localStorage';
 import {
   addRandomBlock,
-  getCellColor,
   isGameLose,
   isGameWin,
   type Map2048,
@@ -97,7 +96,7 @@ export const App = () => {
         <GameInstructions newGameButton={newGameButton('New Game')} />
 
         <div className="relative box-border w-full aspect-square p-4 bg-gray-400 rounded-lg">
-          <GameBoard map={map} getCellColor={getCellColor} />
+          <GameBoard map={map} />
           {/* Game Status Overlays */}
           {gameStatus === 'win' && (
             <GameStatusOverlay

@@ -203,32 +203,3 @@ export const isGameLose = (map: Map2048): boolean => {
   });
   return !isMovable;
 };
-
-export const getCellColor = (value: Cell | undefined): string => {
-  switch (value) {
-    case 2:
-      return 'bg-blue-100';
-    case 4:
-      return 'bg-blue-200';
-    case 8:
-      return 'bg-green-200';
-    case 16:
-      return 'bg-green-300';
-    case 32:
-      return 'bg-yellow-200';
-    case 64:
-      return 'bg-yellow-300';
-    case 128:
-      return 'bg-orange-200';
-    case 256:
-      return 'bg-orange-300';
-    case 512:
-      return 'bg-red-200';
-    case 1024:
-      return 'bg-red-300';
-    case 2048:
-      return 'bg-purple-300';
-    default:
-      return 'bg-gray-300'; // Default color for empty cells or higher values
-  }
-};
