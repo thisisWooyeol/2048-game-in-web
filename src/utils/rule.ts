@@ -6,6 +6,7 @@ import {
   revertDegreeMap,
   type RotateDegree,
   rotateDegreeMap,
+  type State2048,
 } from '@/constants';
 
 type GetRule2048Props = {
@@ -15,7 +16,7 @@ type GetRule2048Props = {
 };
 
 type Rule2048 = {
-  resetMap: () => Map2048;
+  resetGame: () => State2048;
   isGameWin: (map: Map2048) => boolean;
   isGameLose: (map: Map2048) => boolean;
   move: (map: Map2048, direction: Direction) => MoveResult;
@@ -27,11 +28,17 @@ export const getRule2048 = ({
   NUM_COLS,
   WINNING_SCORE,
 }: GetRule2048Props): Rule2048 => {
-  const resetMap = (): Map2048 => {
+  const resetGame = (): State2048 => {
     const map: Map2048 = Array.from({ length: NUM_ROWS }, () => {
       return Array.from({ length: NUM_COLS }, () => null);
     });
-    return addRandomBlock(addRandomBlock(map));
+    const initialMap = addRandomBlock(addRandomBlock(map));
+    return {
+      map: initialMap,
+      score: 0,
+      bestScore: 0,
+      gameStatus: 'playing',
+    };
   };
 
   const isGameWin = (map: Map2048): boolean => {
@@ -73,7 +80,7 @@ export const getRule2048 = ({
   };
 
   return {
-    resetMap,
+    resetGame,
     isGameWin,
     isGameLose,
     move,

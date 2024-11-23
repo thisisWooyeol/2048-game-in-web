@@ -9,24 +9,20 @@ import { GameStatusOverlay } from '@/components/GameStatusOverlay';
 import { Header } from '@/components/Header';
 import { type Map2048, type State2048, stringDirectionMap } from '@/constants';
 import { useKeyPress } from '@/hooks/useKeyPress';
-import { loadGameState, saveGameState } from '@/utils/localStorage';
+import { getStorage2048 } from '@/repositories/storage';
 import { getRule2048 } from '@/utils/rule';
 
-export const App = () => {
-  const { resetMap, isGameWin, isGameLose, move, addRandomBlock } = getRule2048(
-    {
-      NUM_ROWS: 4,
-      NUM_COLS: 4,
-      WINNING_SCORE: 2048,
-    },
-  );
+const { resetGame, isGameWin, isGameLose, move, addRandomBlock } = getRule2048({
+  NUM_ROWS: 4,
+  NUM_COLS: 4,
+  WINNING_SCORE: 2048,
+});
+const { loadGameState, saveGameState } = getStorage2048();
 
-  const [state2048, setState2048] = useState<State2048>({
-    map: loadGameState()?.map ?? resetMap(),
-    score: loadGameState()?.score ?? 0,
-    bestScore: loadGameState()?.bestScore ?? 0,
-    gameStatus: loadGameState()?.gameStatus ?? 'playing',
-  });
+export const App = () => {
+  const [state2048, setState2048] = useState<State2048>(
+    () => loadGameState() ?? resetGame(),
+  );
 
   useEffect(() => {
     saveGameState(state2048);
@@ -35,10 +31,8 @@ export const App = () => {
   // Event Handlers
   const newGameHandler = () => {
     setState2048((prevState) => ({
-      map: resetMap(),
-      score: 0,
+      ...resetGame(),
       bestScore: prevState.bestScore,
-      gameStatus: 'playing',
     }));
     console.info('New game started!');
   };
@@ -87,14 +81,7 @@ export const App = () => {
         }
       }
     },
-    [
-      state2048.gameStatus,
-      state2048.map,
-      move,
-      addRandomBlock,
-      isGameWin,
-      isGameLose,
-    ],
+    [state2048.gameStatus, state2048.map],
   );
 
   useKeyPress(keyPressHandler);
