@@ -12,7 +12,9 @@
     "lint:check": "eslint .",
     "lint:fix": "eslint --fix .",
     "unused:check": "knip",
-    "check-all": "yarn types:check && yarn format:check && yarn lint:check && yarn unused:check"
+    "test": "vitest run",
+    "test:watch": "vitest watch",
+    "check-all": "yarn types:check && yarn format:check && yarn lint:check && yarn unused:check && yarn test"
   },
   "dependencies": {
     "@vercel/analytics": "1.3.1",
@@ -34,7 +36,8 @@
     "prettier-plugin-tailwindcss": "0.6.9",
     "tailwindcss": "3.4.11",
     "typescript": "5.6.2",
-    "vite": "5.4.5"
+    "vite": "5.4.5",
+    "vitest": "2.1.5"
   },
   "packageManager": "yarn@4.4.1"
 }
