@@ -60,14 +60,7 @@ type State2048 = {
   gameStatus: 'playing' | 'win' | 'lose';
 };
 
-export type {
-  Cell,
-  Map2048,
-  RotateDegree,
-  DirectionDegreeMap,
-  MoveResult,
-  State2048,
-};
+export type { Cell, Map2048, RotateDegree, MoveResult, State2048 };
 
 export {
   ARROW_KEYS,

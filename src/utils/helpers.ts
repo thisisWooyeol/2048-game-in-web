@@ -35,7 +35,7 @@ export const moveLeft = (map: Map2048): MoveResult => {
   return { map: result, isMoved, newPoints };
 };
 
-export const moveRowLeft = (
+const moveRowLeft = (
   row: Cell[],
 ): { result: Cell[]; isMoved: boolean; newPoints: number } => {
   const reduced = row.reduce(
