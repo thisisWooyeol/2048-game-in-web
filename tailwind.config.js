@@ -19,6 +19,10 @@ export default {
           1024: 'hsl(0, 93.5%, 81.8%)',
           2048: 'hsl(269, 97.4%, 85.1%)',
         },
+        overlay: {
+          win: 'hsl(171, 76.9%, 64.3%)',
+          lose: 'hsl(0, 93.5%, 81.8%)',
+        },
       },
       keyframes: {
         zoomIn: {
@@ -43,7 +47,8 @@ export default {
   },
   safelist: [
     {
-      pattern: /bg-tile-(empty|2|4|8|16|32|64|128|256|512|1024|2048)/,
+      pattern:
+        /bg-tile-(empty|2|4|8|16|32|64|128|256|512|1024|2048)|bg-overlay-(win|lose)/,
     },
   ],
   plugins: [],

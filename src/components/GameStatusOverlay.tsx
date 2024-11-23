@@ -10,14 +10,12 @@ export const GameStatusOverlay = ({
   newGameButton,
 }: GameStatusOverlayProps) => {
   const isWin = status === 'win';
-  const bgColor = isWin
-    ? 'bg-teal-300 bg-opacity-50'
-    : 'bg-red-300 bg-opacity-50';
+  const bgColor = `bg-overlay-${isWin ? 'win' : 'lose'}`;
   const message = isWin ? 'You Win!' : 'Game Over!';
 
   return (
     <div
-      className={`${bgColor} absolute inset-0 flex flex-col items-center justify-center rounded-lg`}
+      className={`${bgColor} absolute inset-0 flex flex-col items-center justify-center rounded-lg bg-opacity-50`}
     >
       <p className="mb-4 text-5xl font-extrabold">{message}</p>
       {newGameButton}
