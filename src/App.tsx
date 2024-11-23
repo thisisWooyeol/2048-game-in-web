@@ -7,43 +7,54 @@ import { GameBoard } from '@/components/GameBoard';
 import { GameInstructions } from '@/components/GameInstructions';
 import { GameStatusOverlay } from '@/components/GameStatusOverlay';
 import { Header } from '@/components/Header';
+import { type State2048, stringDirectionMap } from '@/constants';
 import { useKeyPress } from '@/hooks/useKeyPress';
-import { loadGameState, saveGameState } from '@/utils/localStorage';
-import {
-  addRandomBlock,
-  isGameLose,
-  isGameWin,
-  type Map2048,
-  moveMapIn2048Rule,
-  resetMap,
-  stringDirectionMap,
-} from '@/utils/Map2048';
+import { getStorage2048 } from '@/repositories/storage';
+import { getRule2048 } from '@/utils/rule';
+
+const { resetGame, move } = getRule2048({
+  NUM_ROWS: 4,
+  NUM_COLS: 4,
+  WINNING_SCORE: 2048,
+});
+const { loadGameState, saveGameState } = getStorage2048();
 
 export const App = () => {
-  const rowLength: number = 4;
-  const columnLength: number = 4;
-
-  // Initialize state with data from Local Storage or start fresh
-  const [map, setMap] = useState<Map2048>(
-    () => loadGameState()?.map ?? resetMap(rowLength, columnLength),
-  );
-  const [score, setScore] = useState<number>(loadGameState()?.score ?? 0);
-  const [bestScore, setBestScore] = useState<number>(
-    loadGameState()?.bestScore ?? 0,
-  );
-  const [gameStatus, setGameStatus] = useState<'playing' | 'win' | 'lose'>(
-    loadGameState()?.gameStatus ?? 'playing',
+  const [state2048, setState2048] = useState<State2048>(
+    () => loadGameState() ?? resetGame(),
   );
 
   useEffect(() => {
-    saveGameState({ map, score, bestScore, gameStatus });
-  }, [map, score, bestScore, gameStatus]);
+    saveGameState(state2048);
+  }, [state2048]);
 
   // Event Handlers
+  const keyPressHandler = useCallback(
+    (key: string) => {
+      if (state2048.gameStatus !== 'playing') return;
+      console.debug('Key Pressed:', key);
+
+      const direction = stringDirectionMap[key];
+      if (direction === undefined) return;
+
+      const newState2048 = move(state2048, direction);
+
+      setState2048(() => newState2048);
+
+      // alert win or lose
+      if (newState2048.gameStatus === 'win') console.info('You win!');
+      if (newState2048.gameStatus === 'lose') console.info('You lose!');
+    },
+    [state2048],
+  );
+
+  useKeyPress(keyPressHandler);
+
   const newGameHandler = () => {
-    setMap(resetMap(rowLength, columnLength));
-    setScore(0);
-    setGameStatus('playing');
+    setState2048((prevState) => ({
+      ...resetGame(),
+      bestScore: prevState.bestScore,
+    }));
     console.info('New game started!');
   };
   const newGameButton = (text: string) => {
@@ -57,54 +68,22 @@ export const App = () => {
     );
   };
 
-  const keyPressHandler = useCallback(
-    (key: string) => {
-      if (gameStatus !== 'playing') return;
-      console.debug('Key Pressed:', key);
-
-      const direction = stringDirectionMap[key];
-      if (direction === undefined) return;
-
-      const { result, isMoved, newPoints } = moveMapIn2048Rule(map, direction);
-      if (isMoved) {
-        const updatedMap: Map2048 = addRandomBlock(result);
-        setMap(updatedMap);
-        setScore((prevScore) => prevScore + newPoints);
-        setBestScore((prevBestScore) =>
-          Math.max(prevBestScore, score + newPoints),
-        );
-
-        // check if the game is over
-        if (isGameWin(updatedMap)) {
-          setGameStatus('win');
-          console.info('You win!');
-        } else if (isGameLose(updatedMap)) {
-          setGameStatus('lose');
-          console.info('You lose!');
-        }
-      }
-    },
-    [gameStatus, map, score],
-  );
-
-  useKeyPress(keyPressHandler);
-
   return (
     <div className="flex h-dvh max-w-7xl items-center justify-center p-8">
       <div className="grid w-full max-w-lg grid-flow-row gap-5">
-        <Header score={score} bestScore={bestScore} />
+        <Header score={state2048.score} bestScore={state2048.bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
 
         <div className="relative box-border aspect-square w-full rounded-lg bg-gray-400 p-4">
-          <GameBoard map={map} />
+          <GameBoard map={state2048.map} />
           {/* Game Status Overlays */}
-          {gameStatus === 'win' && (
+          {state2048.gameStatus === 'win' && (
             <GameStatusOverlay
               status="win"
               newGameButton={newGameButton('Play Again?')}
             />
           )}
-          {gameStatus === 'lose' && (
+          {state2048.gameStatus === 'lose' && (
             <GameStatusOverlay
               status="lose"
               newGameButton={newGameButton('Try Again?')}

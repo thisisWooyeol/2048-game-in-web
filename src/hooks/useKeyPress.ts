@@ -1,15 +1,6 @@
 import { useEffect } from 'react';
 
-const ARROW_KEYS = [
-  'ArrowUp',
-  'ArrowDown',
-  'ArrowLeft',
-  'ArrowRight',
-  'w',
-  'a',
-  's',
-  'd',
-];
+import { ARROW_KEYS } from '@/constants';
 
 export const useKeyPress = (handler: (key: string) => void) => {
   useEffect(() => {
