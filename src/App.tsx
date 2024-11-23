@@ -55,31 +55,15 @@ export const App = () => {
       const direction = stringDirectionMap[key];
       if (direction === undefined) return;
 
-      const { map, newPoints } = move(state2048.map, direction);
+      const newState2048 = move(state2048, direction);
 
-      setState2048((prevState) => ({
-        ...prevState,
-        map: map,
-        score: prevState.score + newPoints,
-        bestScore: Math.max(prevState.bestScore, prevState.score + newPoints),
-      }));
+      setState2048(() => newState2048);
 
-      // check if the game is over
-      if (isGameWin(map)) {
-        setState2048((prevState) => ({
-          ...prevState,
-          gameStatus: 'win',
-        }));
-        console.info('You win!');
-      } else if (isGameLose(map)) {
-        setState2048((prevState) => ({
-          ...prevState,
-          gameStatus: 'lose',
-        }));
-        console.info('You lose!');
-      }
+      // alert win or lose
+      if (isGameWin(newState2048.map)) console.info('You win!');
+      if (isGameLose(newState2048.map)) console.info('You lose!');
     },
-    [state2048.gameStatus, state2048.map],
+    [state2048],
   );
 
   useKeyPress(keyPressHandler);

@@ -1,7 +1,6 @@
 import {
   Direction,
   type Map2048,
-  type MoveResult,
   revertDegreeMap,
   rotateDegreeMap,
   type State2048,
@@ -23,7 +22,7 @@ type Rule2048 = {
   resetGame: () => State2048;
   isGameWin: (map: Map2048) => boolean;
   isGameLose: (map: Map2048) => boolean;
-  move: (map: Map2048, direction: Direction) => MoveResult;
+  move: (state: State2048, direction: Direction) => State2048;
 };
 
 export const getRule2048 = ({
@@ -58,18 +57,21 @@ export const getRule2048 = ({
       Direction.Down,
       Direction.Left,
     ].some((direction) => {
-      const { isMoved } = move(map, direction);
+      const rotatedMap = rotateMapCounterClockwise(
+        map,
+        rotateDegreeMap[direction],
+      );
+      const { isMoved } = moveLeft(rotatedMap);
       return isMoved;
     });
-
     return !isMovable;
   };
 
-  const move = (map: Map2048, direction: Direction): MoveResult => {
-    if (!validateMapIsNByM(map)) throw new Error('Map is not N by M');
+  const move = (state: State2048, direction: Direction): State2048 => {
+    if (!validateMapIsNByM(state.map)) throw new Error('Map is not N by M');
 
     const rotatedMap = rotateMapCounterClockwise(
-      map,
+      state.map,
       rotateDegreeMap[direction],
     );
     const { map: result, isMoved, newPoints } = moveLeft(rotatedMap);
@@ -78,10 +80,19 @@ export const getRule2048 = ({
       revertDegreeMap[direction],
     );
 
+    const updatedMap = isMoved ? addRandomBlock(resultMap) : resultMap;
+    const newScore = state.score + newPoints;
+    const bestScore = Math.max(state.bestScore, newScore);
+
+    const isWin = isGameWin(updatedMap);
+    const isLose = isGameLose(updatedMap);
+    const newGameStatus = isWin ? 'win' : isLose ? 'lose' : 'playing';
+
     return {
-      map: isMoved ? addRandomBlock(resultMap) : resultMap,
-      isMoved,
-      newPoints,
+      map: updatedMap,
+      score: newScore,
+      bestScore: bestScore,
+      gameStatus: newGameStatus,
     };
   };
 
