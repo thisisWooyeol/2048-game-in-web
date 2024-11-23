@@ -74,25 +74,27 @@ export const getRule2048 = ({
       state.map,
       rotateDegreeMap[direction],
     );
-    const { map: result, isMoved, newPoints } = moveLeft(rotatedMap);
-    const resultMap = rotateMapCounterClockwise(
-      result,
+
+    const { map: movedMap, isMoved, newPoints } = moveLeft(rotatedMap);
+
+    const restoredMap = rotateMapCounterClockwise(
+      movedMap,
       revertDegreeMap[direction],
     );
 
-    const updatedMap = isMoved ? addRandomBlock(resultMap) : resultMap;
-    const newScore = state.score + newPoints;
-    const bestScore = Math.max(state.bestScore, newScore);
+    const finalMap = isMoved ? addRandomBlock(restoredMap) : restoredMap;
+    const updatedScore = state.score + newPoints;
+    const updatedBestScore = Math.max(state.bestScore, updatedScore);
 
-    const isWin = isGameWin(updatedMap);
-    const isLose = isGameLose(updatedMap);
-    const newGameStatus = isWin ? 'win' : isLose ? 'lose' : 'playing';
+    const gameWon = isGameWin(finalMap);
+    const gameLost = isGameLose(finalMap);
+    const currentGameStatus = gameWon ? 'win' : gameLost ? 'lose' : 'playing';
 
     return {
-      map: updatedMap,
-      score: newScore,
-      bestScore: bestScore,
-      gameStatus: newGameStatus,
+      map: finalMap,
+      score: updatedScore,
+      bestScore: updatedBestScore,
+      gameStatus: currentGameStatus,
     };
   };
 

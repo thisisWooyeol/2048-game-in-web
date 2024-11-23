@@ -29,24 +29,6 @@ export const App = () => {
   }, [state2048]);
 
   // Event Handlers
-  const newGameHandler = () => {
-    setState2048((prevState) => ({
-      ...resetGame(),
-      bestScore: prevState.bestScore,
-    }));
-    console.info('New game started!');
-  };
-  const newGameButton = (text: string) => {
-    return (
-      <button
-        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
-        onClick={newGameHandler}
-      >
-        {text}
-      </button>
-    );
-  };
-
   const keyPressHandler = useCallback(
     (key: string) => {
       if (state2048.gameStatus !== 'playing') return;
@@ -67,6 +49,24 @@ export const App = () => {
   );
 
   useKeyPress(keyPressHandler);
+
+  const newGameHandler = () => {
+    setState2048((prevState) => ({
+      ...resetGame(),
+      bestScore: prevState.bestScore,
+    }));
+    console.info('New game started!');
+  };
+  const newGameButton = (text: string) => {
+    return (
+      <button
+        className="rounded bg-blue-500 px-4 py-2 font-bold text-white hover:bg-blue-700"
+        onClick={newGameHandler}
+      >
+        {text}
+      </button>
+    );
+  };
 
   return (
     <div className="flex h-dvh max-w-7xl items-center justify-center p-8">
