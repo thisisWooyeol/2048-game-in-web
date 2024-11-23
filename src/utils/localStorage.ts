@@ -1,13 +1,6 @@
-import { type Map2048 } from './Map2048';
+import type { Map2048, State2048 } from '@/constants';
 
-export const loadGameState = ():
-  | {
-      map: Map2048;
-      score: number;
-      bestScore: number;
-      gameStatus: 'playing' | 'win' | 'lose';
-    }
-  | undefined => {
+export const loadGameState = (): State2048 | undefined => {
   try {
     const serializedState = localStorage.getItem('gameState');
     if (serializedState === null) {
@@ -25,12 +18,7 @@ export const loadGameState = ():
   }
 };
 
-export const saveGameState = (state: {
-  map: Map2048;
-  score: number;
-  bestScore: number;
-  gameStatus: 'playing' | 'win' | 'lose';
-}) => {
+export const saveGameState = (state: State2048) => {
   try {
     const serializedState = JSON.stringify(state);
     localStorage.setItem('gameState', serializedState);
