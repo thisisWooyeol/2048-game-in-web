@@ -71,11 +71,19 @@ export const App = () => {
   return (
     <div className="flex h-dvh max-w-7xl items-center justify-center p-8">
       <div className="grid w-full max-w-lg grid-flow-row gap-5">
+<<<<<<< HEAD
         <Header score={state2048.score} bestScore={state2048.bestScore} />
         <GameInstructions newGameButton={newGameButton('New Game')} />
 
         <div className="relative box-border aspect-square w-full rounded-lg bg-gray-400 p-4">
           <GameBoard map={state2048.map} />
+=======
+        <Header score={score} bestScore={bestScore} />
+        <GameInstructions newGameButton={newGameButton('New Game')} />
+
+        <div className="relative box-border aspect-square w-full rounded-lg bg-gray-400 p-4">
+          <GameBoard map={map} />
+>>>>>>> main
           {/* Game Status Overlays */}
           {state2048.gameStatus === 'win' && (
             <GameStatusOverlay
