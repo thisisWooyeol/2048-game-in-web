@@ -1,5 +1,5 @@
-import { type Map2048 } from '../utils/Map2048';
-import { Tile } from './Tile';
+import { Tile } from '@/components/Tile';
+import { type Map2048 } from '@/constants';
 
 type GameBoardProps = {
   map: Map2048;

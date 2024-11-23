@@ -1,4 +1,4 @@
-import type { Map2048, State2048 } from '@/constants';
+import type { State2048 } from '@/constants';
 
 type Storage2048 = {
   loadGameState: () => State2048 | undefined;
@@ -12,12 +12,7 @@ export const getStorage2048 = (): Storage2048 => ({
       if (serializedState === null) {
         return undefined;
       }
-      return JSON.parse(serializedState) as {
-        map: Map2048;
-        score: number;
-        bestScore: number;
-        gameStatus: 'playing' | 'win' | 'lose';
-      };
+      return JSON.parse(serializedState) as State2048;
     } catch (err) {
       console.error('Failed to load game state from localStorage:', err);
       return undefined;
