@@ -6,7 +6,7 @@ type GameInstructionsProps = {
 
 export const GameInstructions = ({ newGameButton }: GameInstructionsProps) => {
   return (
-    <div className="grid grid-cols-4 gap-4 items-center">
+    <div className="grid grid-cols-4 items-center gap-4">
       <div className="col-span-3 text-left">
         <p>
           Join the tiles, get to <strong>2048!</strong>
