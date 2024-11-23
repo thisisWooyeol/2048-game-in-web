@@ -20,7 +20,6 @@ type Rule2048 = {
   isGameWin: (map: Map2048) => boolean;
   isGameLose: (map: Map2048) => boolean;
   move: (map: Map2048, direction: Direction) => MoveResult;
-  addRandomBlock: (map: Map2048) => Map2048;
 };
 
 export const getRule2048 = ({
@@ -69,11 +68,14 @@ export const getRule2048 = ({
       map,
       rotateDegreeMap[direction],
     );
-
-    const { result, isMoved, newPoints } = moveLeft(rotatedMap);
+    const { map: result, isMoved, newPoints } = moveLeft(rotatedMap);
+    const resultMap = rotateMapCounterClockwise(
+      result,
+      revertDegreeMap[direction],
+    );
 
     return {
-      result: rotateMapCounterClockwise(result, revertDegreeMap[direction]),
+      map: isMoved ? addRandomBlock(resultMap) : resultMap,
       isMoved,
       newPoints,
     };
@@ -84,7 +86,6 @@ export const getRule2048 = ({
     isGameWin,
     isGameLose,
     move,
-    addRandomBlock,
   };
 };
 
@@ -120,7 +121,7 @@ const moveLeft = (map: Map2048): MoveResult => {
   const result = movedRows.map((movedRow) => movedRow.result);
   const isMoved = movedRows.some((movedRow) => movedRow.isMoved);
   const newPoints = movedRows.reduce((acc, row) => acc + row.newPoints, 0);
-  return { result, isMoved, newPoints };
+  return { map: result, isMoved, newPoints };
 };
 
 const moveRowLeft = (

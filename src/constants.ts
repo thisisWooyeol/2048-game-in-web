@@ -48,7 +48,7 @@ const stringDirectionMap: Record<string, Direction> = {
 };
 
 type MoveResult = {
-  result: Map2048;
+  map: Map2048;
   isMoved: boolean;
   newPoints: number;
 };

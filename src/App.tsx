@@ -7,12 +7,12 @@ import { GameBoard } from '@/components/GameBoard';
 import { GameInstructions } from '@/components/GameInstructions';
 import { GameStatusOverlay } from '@/components/GameStatusOverlay';
 import { Header } from '@/components/Header';
-import { type Map2048, type State2048, stringDirectionMap } from '@/constants';
+import { type State2048, stringDirectionMap } from '@/constants';
 import { useKeyPress } from '@/hooks/useKeyPress';
 import { getStorage2048 } from '@/repositories/storage';
 import { getRule2048 } from '@/utils/rule';
 
-const { resetGame, isGameWin, isGameLose, move, addRandomBlock } = getRule2048({
+const { resetGame, isGameWin, isGameLose, move } = getRule2048({
   NUM_ROWS: 4,
   NUM_COLS: 4,
   WINNING_SCORE: 2048,
@@ -55,30 +55,28 @@ export const App = () => {
       const direction = stringDirectionMap[key];
       if (direction === undefined) return;
 
-      const { result, isMoved, newPoints } = move(state2048.map, direction);
-      if (isMoved) {
-        const updatedMap: Map2048 = addRandomBlock(result);
+      const { map, newPoints } = move(state2048.map, direction);
+
+      setState2048((prevState) => ({
+        ...prevState,
+        map: map,
+        score: prevState.score + newPoints,
+        bestScore: Math.max(prevState.bestScore, prevState.score + newPoints),
+      }));
+
+      // check if the game is over
+      if (isGameWin(map)) {
         setState2048((prevState) => ({
           ...prevState,
-          map: updatedMap,
-          score: prevState.score + newPoints,
-          bestScore: Math.max(prevState.bestScore, prevState.score + newPoints),
+          gameStatus: 'win',
         }));
-
-        // check if the game is over
-        if (isGameWin(updatedMap)) {
-          setState2048((prevState) => ({
-            ...prevState,
-            gameStatus: 'win',
-          }));
-          console.info('You win!');
-        } else if (isGameLose(updatedMap)) {
-          setState2048((prevState) => ({
-            ...prevState,
-            gameStatus: 'lose',
-          }));
-          console.info('You lose!');
-        }
+        console.info('You win!');
+      } else if (isGameLose(map)) {
+        setState2048((prevState) => ({
+          ...prevState,
+          gameStatus: 'lose',
+        }));
+        console.info('You lose!');
       }
     },
     [state2048.gameStatus, state2048.map],
