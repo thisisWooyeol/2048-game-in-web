@@ -20,8 +20,6 @@ type GetRule2048Props = {
 
 type Rule2048 = {
   resetGame: () => State2048;
-  isGameWin: (map: Map2048) => boolean;
-  isGameLose: (map: Map2048) => boolean;
   move: (state: State2048, direction: Direction) => State2048;
 };
 
@@ -100,8 +98,6 @@ export const getRule2048 = ({
 
   return {
     resetGame,
-    isGameWin,
-    isGameLose,
     move,
   };
 };

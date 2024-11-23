@@ -12,7 +12,7 @@ import { useKeyPress } from '@/hooks/useKeyPress';
 import { getStorage2048 } from '@/repositories/storage';
 import { getRule2048 } from '@/utils/rule';
 
-const { resetGame, isGameWin, isGameLose, move } = getRule2048({
+const { resetGame, move } = getRule2048({
   NUM_ROWS: 4,
   NUM_COLS: 4,
   WINNING_SCORE: 2048,
@@ -42,8 +42,8 @@ export const App = () => {
       setState2048(() => newState2048);
 
       // alert win or lose
-      if (isGameWin(newState2048.map)) console.info('You win!');
-      if (isGameLose(newState2048.map)) console.info('You lose!');
+      if (newState2048.gameStatus === 'win') console.info('You win!');
+      if (newState2048.gameStatus === 'lose') console.info('You lose!');
     },
     [state2048],
   );
